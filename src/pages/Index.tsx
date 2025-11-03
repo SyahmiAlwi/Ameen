@@ -1,12 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAmalTracker } from '@/hooks/useAmalTracker';
+import { useStreakTracker } from '@/hooks/useStreakTracker';
 import { PRAYER_TIMES } from '@/constants/amalan';
 import { Header } from '@/components/Header';
 import { ProgressRing } from '@/components/ProgressRing';
 import { PrayerSection } from '@/components/PrayerSection';
 import { AmalDialog } from '@/components/AmalDialog';
+import { StreakCounter } from '@/components/StreakCounter';
 import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
 import { Amal, PrayerTime } from '@/types';
+import { History as HistoryIcon } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,6 +45,13 @@ const Index = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [amalToDelete, setAmalToDelete] = useState<string | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const { currentStreak, longestStreak, totalDays, refreshStreaks } = useStreakTracker();
+
+  // Refresh streaks when completion changes
+  useEffect(() => {
+    refreshStreaks();
+  }, [completed, refreshStreaks]);
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -106,6 +118,24 @@ const Index = () => {
       <Header onReset={resetDay} date={today} />
       
       <main className="container max-w-3xl mx-auto px-4 py-8">
+        {/* History Button */}
+        <div className="flex justify-end mb-4">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/history')}
+            className="gap-2"
+          >
+            <HistoryIcon className="w-4 h-4" />
+            View History
+          </Button>
+        </div>
+
+        {/* Streak Counter */}
+        <StreakCounter 
+          currentStreak={currentStreak}
+          longestStreak={longestStreak}
+          totalDays={totalDays}
+        />
         {/* Progress Section */}
         <div className="mb-10 flex flex-col items-center text-center space-y-4 animate-slide-up">
           <ProgressRing percentage={percentage} />
