@@ -1,12 +1,45 @@
+import { useState } from 'react';
 import { useAmalTracker } from '@/hooks/useAmalTracker';
-import { AMALAN_LIST, PRAYER_TIMES } from '@/constants/amalan';
+import { PRAYER_TIMES } from '@/constants/amalan';
 import { Header } from '@/components/Header';
 import { ProgressRing } from '@/components/ProgressRing';
 import { PrayerSection } from '@/components/PrayerSection';
+import { AmalDialog } from '@/components/AmalDialog';
 import { Separator } from '@/components/ui/separator';
+import { Amal, PrayerTime } from '@/types';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
 
 const Index = () => {
-  const { completed, toggleAmal, resetDay, percentage, isLoading, completedCount, totalItems } = useAmalTracker();
+  const { 
+    amalanList, 
+    completed, 
+    toggleAmal, 
+    addAmal, 
+    updateAmal, 
+    deleteAmal, 
+    resetDay, 
+    percentage, 
+    isLoading, 
+    completedCount, 
+    totalItems 
+  } = useAmalTracker();
+  
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingAmal, setEditingAmal] = useState<Amal | null>(null);
+  const [defaultCategory, setDefaultCategory] = useState<PrayerTime | undefined>();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [amalToDelete, setAmalToDelete] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const today = new Date().toLocaleDateString('en-US', {
     weekday: 'long',
@@ -14,6 +47,51 @@ const Index = () => {
     month: 'long',
     day: 'numeric',
   });
+
+  const handleAddClick = (category: PrayerTime) => {
+    setEditingAmal(null);
+    setDefaultCategory(category);
+    setDialogOpen(true);
+  };
+
+  const handleEditClick = (amal: Amal) => {
+    setEditingAmal(amal);
+    setDefaultCategory(undefined);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setAmalToDelete(id);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleSaveAmal = (amal: Amal) => {
+    if (editingAmal) {
+      updateAmal(amal.id, amal);
+      toast({
+        title: "Updated",
+        description: "Amal has been updated successfully.",
+      });
+    } else {
+      addAmal(amal);
+      toast({
+        title: "Added",
+        description: "New amal has been added successfully.",
+      });
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (amalToDelete) {
+      deleteAmal(amalToDelete);
+      toast({
+        title: "Deleted",
+        description: "Amal has been removed successfully.",
+      });
+      setAmalToDelete(null);
+    }
+    setDeleteDialogOpen(false);
+  };
 
   if (isLoading) {
     return (
@@ -44,7 +122,7 @@ const Index = () => {
         {/* Prayer Sections */}
         <div className="space-y-8">
           {PRAYER_TIMES.map((prayerTime, index) => {
-            const items = AMALAN_LIST.filter(amal => amal.category === prayerTime);
+            const items = amalanList.filter(amal => amal.category === prayerTime);
             
             return (
               <div key={prayerTime} style={{ animationDelay: `${index * 100}ms` }}>
@@ -53,6 +131,9 @@ const Index = () => {
                   items={items}
                   completed={completed}
                   onToggle={toggleAmal}
+                  onEdit={handleEditClick}
+                  onDelete={handleDeleteClick}
+                  onAdd={handleAddClick}
                 />
                 
                 {index < PRAYER_TIMES.length - 1 && (
@@ -72,6 +153,29 @@ const Index = () => {
           </p>
         </div>
       </main>
+
+      <AmalDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSave={handleSaveAmal}
+        editingAmal={editingAmal}
+        defaultCategory={defaultCategory}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Amal</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this amal? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
