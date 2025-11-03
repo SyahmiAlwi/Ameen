@@ -17,8 +17,8 @@ export const AmalCheckbox = ({ id, text, checked, onToggle, onEdit, onDelete }: 
       className={cn(
         "w-full flex items-center gap-3 p-4 rounded-lg border transition-all duration-300 group",
         checked
-          ? "bg-primary/5 border-primary/30"
-          : "bg-card border-border hover:border-primary/30"
+          ? "bg-primary/5 border-primary/30 shadow-sm"
+          : "bg-card border-border hover:border-primary/30 hover:shadow-soft"
       )}
     >
       <button
