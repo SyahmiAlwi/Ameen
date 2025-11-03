@@ -6,7 +6,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, TrendingUp, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, XCircle, TrendingUp, ArrowLeft, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface DayData {
@@ -18,6 +18,7 @@ interface DayData {
 const History = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [range, setRange] = useState<{ from?: Date; to?: Date }>({});
   const [historyData, setHistoryData] = useState<Record<string, DayData>>({});
   const [selectedDayData, setSelectedDayData] = useState<DayData | null>(null);
 
@@ -87,6 +88,36 @@ const History = () => {
 
   const stats = calculateStats();
 
+  const exportCsv = () => {
+    const rows: string[] = ["date,percentage,completed_count"];
+    const entries = Object.entries(historyData)
+      .map(([date, d]) => ({ date, ...d }))
+      .filter(({ date }) => {
+        if (range.from && range.to) {
+          const dt = new Date(date);
+          const from = new Date(range.from.setHours(0,0,0,0));
+          const to = new Date(range.to.setHours(23,59,59,999));
+          return dt >= from && dt <= to;
+        }
+        return true;
+      })
+      .sort((a, b) => a.date.localeCompare(b.date));
+
+    entries.forEach(({ date, percentage, completed }) => {
+      rows.push(`${date},${percentage},${completed.length}`);
+    });
+
+    const blob = new Blob([rows.join("\n")], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'ameen-history.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Header 
@@ -107,7 +138,21 @@ const History = () => {
           </Button>
         </div>
 
-        {/* Stats Overview */}
+        {/* Stats Overview + Export */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="text-sm text-muted-foreground">
+            {range.from && range.to ? (
+              <span>
+                Showing {formatDisplayDate(range.from)} – {formatDisplayDate(range.to)}
+              </span>
+            ) : (
+              <span>Showing all recorded days</span>
+            )}
+          </div>
+          <Button variant="outline" size="sm" onClick={() => exportCsv()} className="gap-2">
+            <Download className="w-4 h-4" /> Export CSV
+          </Button>
+        </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <Card className="p-4">
             <div className="flex items-center gap-3">
@@ -165,9 +210,12 @@ const History = () => {
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4">Select a Date</h3>
             <Calendar
-              mode="single"
-              selected={selectedDate}
-              onSelect={setSelectedDate}
+              mode="range"
+              selected={range}
+              onSelect={(r: any) => {
+                setRange(r || {});
+                if (r?.from) setSelectedDate(r.from);
+              }}
               className="rounded-md"
               modifiers={{
                 excellent: (date) => getDayStatus(date) === 'excellent',

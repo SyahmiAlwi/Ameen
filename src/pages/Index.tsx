@@ -4,13 +4,14 @@ import { useStreakTracker } from '@/hooks/useStreakTracker';
 import { PRAYER_TIMES } from '@/constants/amalan';
 import { Header } from '@/components/Header';
 import { ProgressRing } from '@/components/ProgressRing';
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { PrayerSection } from '@/components/PrayerSection';
 import { AmalDialog } from '@/components/AmalDialog';
 import { StreakCounter } from '@/components/StreakCounter';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Amal, PrayerTime } from '@/types';
-import { History as HistoryIcon } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertDialog,
@@ -66,6 +67,16 @@ const Index = () => {
     setDialogOpen(true);
   };
 
+  // Determine current prayer time for quick add
+  const getCurrentPrayer = (): PrayerTime => {
+    const hour = new Date().getHours();
+    if (hour < 6) return 'Fajr';
+    if (hour < 13) return 'Dhuhr';
+    if (hour < 17) return 'Asar';
+    if (hour < 20) return 'Maghrib';
+    return 'Isyak';
+  };
+
   const handleEditClick = (amal: Amal) => {
     setEditingAmal(amal);
     setDefaultCategory(undefined);
@@ -95,10 +106,18 @@ const Index = () => {
 
   const handleConfirmDelete = () => {
     if (amalToDelete) {
+      const deleted = amalanList.find(a => a.id === amalToDelete) || null;
       deleteAmal(amalToDelete);
       toast({
         title: "Deleted",
-        description: "Amal has been removed successfully.",
+        description: deleted ? `Removed: ${deleted.text}` : "Amal has been removed.",
+        action: (
+          <Button
+            onClick={() => {
+              if (deleted) addAmal(deleted);
+            }}
+          >Undo</Button>
+        )
       });
       setAmalToDelete(null);
     }
@@ -107,8 +126,23 @@ const Index = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="animate-pulse text-muted-foreground">Loading...</div>
+      <div className="min-h-screen bg-background">
+        <Header onReset={resetDay} date={today} />
+        <main className="container max-w-3xl mx-auto px-4 py-8 space-y-8">
+          <div className="grid grid-cols-1 gap-4">
+            <div className="h-28 rounded-lg bg-muted animate-pulse" />
+            <div className="h-12 rounded-lg bg-muted animate-pulse" />
+          </div>
+          <div className="space-y-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="space-y-2">
+                <div className="h-6 w-40 rounded bg-muted animate-pulse" />
+                <div className="h-14 rounded-lg bg-muted animate-pulse" />
+                <div className="h-14 rounded-lg bg-muted animate-pulse" />
+              </div>
+            ))}
+          </div>
+        </main>
       </div>
     );
   }
@@ -118,32 +152,33 @@ const Index = () => {
       <Header onReset={resetDay} date={today} />
       
       <main className="container max-w-3xl mx-auto px-4 py-8">
-        {/* History Button */}
-        <div className="flex justify-end mb-4">
-          <Button
-            variant="outline"
-            onClick={() => navigate('/history')}
-            className="gap-2"
-          >
-            <HistoryIcon className="w-4 h-4" />
-            View History
-          </Button>
-        </div>
 
-        {/* Streak Counter */}
-        <StreakCounter 
-          currentStreak={currentStreak}
-          longestStreak={longestStreak}
-          totalDays={totalDays}
-        />
-        {/* Progress Section */}
-        <div className="mb-10 flex flex-col items-center text-center space-y-4 animate-slide-up">
-          <ProgressRing percentage={percentage} />
-          <div>
-            <p className="text-lg font-medium text-foreground">
-              {completedCount} of {totalItems} practices
-            </p>
-            <p className="text-sm text-muted-foreground">Keep up the great work!</p>
+        {/* Progress + Streak Card */}
+        <div className="mb-8 grid grid-cols-1 gap-4">
+          <div className="rounded-xl border bg-card shadow-card p-4 flex items-center gap-6">
+            <div className="shrink-0">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div>
+                    <ProgressRing percentage={percentage} />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <span>{totalItems - completedCount} remaining</span>
+                </TooltipContent>
+              </Tooltip>
+            </div>
+            <div className="flex-1 space-y-1">
+              <p className="text-lg font-semibold">{completedCount} of {totalItems} practices</p>
+              <p className="text-sm text-muted-foreground">Keep going, you’re doing great.</p>
+              <div className="mt-2">
+                <StreakCounter 
+                  currentStreak={currentStreak}
+                  longestStreak={longestStreak}
+                  totalDays={totalDays}
+                />
+              </div>
+            </div>
           </div>
         </div>
 
@@ -192,12 +227,28 @@ const Index = () => {
         defaultCategory={defaultCategory}
       />
 
+      {/* Floating Quick Add Button */}
+      <div className="fixed bottom-6 right-6">
+        <Button
+          size="lg"
+          className="rounded-full shadow-card h-12 w-12 p-0"
+          onClick={() => handleAddClick(getCurrentPrayer())}
+          aria-label="Quick add amal"
+        >
+          <Plus className="w-5 h-5" />
+        </Button>
+      </div>
+
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Amal</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this amal? This action cannot be undone.
+              {(() => {
+                const item = amalanList.find(a => a.id === amalToDelete);
+                return item ? `Delete "${item.text}"? This action cannot be undone.` :
+                  'Are you sure you want to delete this amal? This action cannot be undone.';
+              })()}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

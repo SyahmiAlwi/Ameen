@@ -18,6 +18,7 @@ interface AmalDialogProps {
 export const AmalDialog = ({ open, onOpenChange, onSave, editingAmal, defaultCategory }: AmalDialogProps) => {
   const [text, setText] = useState('');
   const [category, setCategory] = useState<PrayerTime>(defaultCategory || 'Fajr');
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (editingAmal) {
@@ -30,7 +31,10 @@ export const AmalDialog = ({ open, onOpenChange, onSave, editingAmal, defaultCat
   }, [editingAmal, defaultCategory, open]);
 
   const handleSave = () => {
-    if (!text.trim()) return;
+    if (!text.trim()) {
+      setError('Please enter a practice name');
+      return;
+    }
 
     const amal: Amal = {
       id: editingAmal?.id || `amal_${Date.now()}`,
@@ -42,15 +46,23 @@ export const AmalDialog = ({ open, onOpenChange, onSave, editingAmal, defaultCat
     onOpenChange(false);
   };
 
+  const presets: string[] = [
+    'Read Quran (2 pages)',
+    'Dhikr (SubhanAllah ×33, Alhamdulillah ×33, Allahu Akbar ×34)',
+    'Dua after prayer',
+    'Tasbih Fatimah',
+  ];
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" aria-describedby="amal-form-description">
         <DialogHeader>
           <DialogTitle>{editingAmal ? 'Edit Amal' : 'Add New Amal'}</DialogTitle>
         </DialogHeader>
+        <div id="amal-form-description" className="sr-only">Enter a name and select a prayer time for this practice.</div>
         <div className="grid gap-4 py-4">
           <div className="grid gap-2">
-            <Label htmlFor="text">Practice Name</Label>
+            <Label htmlFor="text">Practice Name <span className="text-destructive">*</span></Label>
             <Input
               id="text"
               value={text}
@@ -58,6 +70,14 @@ export const AmalDialog = ({ open, onOpenChange, onSave, editingAmal, defaultCat
               placeholder="e.g., Surah Al-Mulk"
               autoFocus
             />
+            {error && <span className="text-xs text-destructive">{error}</span>}
+            <div className="flex flex-wrap gap-2 pt-1">
+              {presets.map((p) => (
+                <Button key={p} type="button" variant="outline" size="sm" onClick={() => setText(p)}>
+                  {p}
+                </Button>
+              ))}
+            </div>
           </div>
           <div className="grid gap-2">
             <Label htmlFor="category">Prayer Time</Label>

@@ -15,7 +15,7 @@ export const AmalCheckbox = ({ id, text, checked, onToggle, onEdit, onDelete }: 
   return (
     <div
       className={cn(
-        "w-full flex items-center gap-3 p-4 rounded-lg border transition-all duration-300 group",
+        "w-full flex items-center gap-3 p-4 rounded-lg border transition-all duration-300 group min-h-14",
         checked
           ? "bg-primary/5 border-primary/30 shadow-sm"
           : "bg-card border-border hover:border-primary/30 hover:shadow-soft"

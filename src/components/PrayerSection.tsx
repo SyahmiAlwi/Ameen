@@ -112,17 +112,26 @@ export const PrayerSection = ({
       </div>
       
       <CollapsibleContent className="space-y-2 pl-12 overflow-hidden transition-all duration-500">
-        {items.map(item => (
-          <AmalCheckbox
-            key={item.id}
-            id={item.id}
-            text={item.text}
-            checked={completed.includes(item.id)}
-            onToggle={onToggle}
-            onEdit={() => onEdit(item)}
-            onDelete={() => onDelete(item.id)}
-          />
-        ))}
+        {items.length === 0 ? (
+          <div className="rounded-lg border bg-secondary text-secondary-foreground/80 p-4 text-sm flex items-center justify-between">
+            <span>No items yet for {prayerTime} — add one</span>
+            <Button size="sm" variant="outline" onClick={() => onAdd(prayerTime)}>
+              Add
+            </Button>
+          </div>
+        ) : (
+          items.map(item => (
+            <AmalCheckbox
+              key={item.id}
+              id={item.id}
+              text={item.text}
+              checked={completed.includes(item.id)}
+              onToggle={onToggle}
+              onEdit={() => onEdit(item)}
+              onDelete={() => onDelete(item.id)}
+            />
+          ))
+        )}
       </CollapsibleContent>
     </Collapsible>
   );
