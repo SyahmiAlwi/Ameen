@@ -8,9 +8,9 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Updated palette */
-    --background: 200 30% 98%;
-    --foreground: 200 15% 20%;
+    /* Updated palette - higher contrast for light mode */
+    --background: 43 45% 97%; /* warm very light, from accent family */
+    --foreground: 200 20% 15%;
 
     --card: 0 0% 100%;
     --card-foreground: 200 15% 20%;
@@ -24,12 +24,12 @@ All colors MUST be HSL.
     --primary-light: 148 30% 55%;
 
     /* Secondary: Gentle cream */
-    --secondary: 200 20% 92%;
+    --secondary: 43 45% 95%;
     --secondary-foreground: 200 15% 20%;
 
     /* Muted: Soft neutrals */
-    --muted: 200 15% 94%;
-    --muted-foreground: 200 10% 45%;
+    --muted: 155 25% 94%;
+    --muted-foreground: 200 15% 40%;
 
     /* Accent (from #e3ca8a) */
     --accent: 43 61% 72%;
@@ -38,8 +38,8 @@ All colors MUST be HSL.
     --destructive: 0 70% 70%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 15% 90%;
-    --input: 200 15% 90%;
+    --border: 200 18% 82%;
+    --input: 200 18% 82%;
     --ring: 155 35% 36%;
 
     --radius: 0.75rem;

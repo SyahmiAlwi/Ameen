@@ -20,8 +20,8 @@ export const Header = ({
         <div className="flex items-center justify-between">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
-              <span className="text-xl font-bold tracking-tight">Ameen</span>
-              <span className="text-xs px-2 py-0.5 rounded-full bg-secondary text-secondary-foreground">PWA</span>
+              <span className="text-xl font-bold tracking-tight text-foreground">Ameen</span>
+              <span className="text-xs px-2 py-0.5 rounded-full bg-accent text-accent-foreground">PWA</span>
             </div>
             <p className="text-sm text-muted-foreground truncate">{date}</p>
           </div>
