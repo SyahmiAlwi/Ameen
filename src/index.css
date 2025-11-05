@@ -8,7 +8,7 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Soft, calming Islamic-inspired palette */
+    /* Updated palette */
     --background: 200 30% 98%;
     --foreground: 200 15% 20%;
 
@@ -18,10 +18,10 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 200 15% 20%;
 
-    /* Primary: Soft Teal - calming & traditional */
-    --primary: 175 45% 65%;
+    /* Primary (from #3b7b60) and light (from #68ae89) */
+    --primary: 155 35% 36%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 175 40% 75%;
+    --primary-light: 148 30% 55%;
 
     /* Secondary: Gentle cream */
     --secondary: 200 20% 92%;
@@ -31,8 +31,8 @@ All colors MUST be HSL.
     --muted: 200 15% 94%;
     --muted-foreground: 200 10% 45%;
 
-    /* Accent: Warm gold */
-    --accent: 40 70% 75%;
+    /* Accent (from #e3ca8a) */
+    --accent: 43 61% 72%;
     --accent-foreground: 200 15% 20%;
 
     --destructive: 0 70% 70%;
@@ -40,13 +40,13 @@ All colors MUST be HSL.
 
     --border: 200 15% 90%;
     --input: 200 15% 90%;
-    --ring: 175 45% 65%;
+    --ring: 155 35% 36%;
 
     --radius: 0.75rem;
 
     /* Custom Islamic design tokens */
-    --islamic-gold: 40 70% 75%;
-    --islamic-green: 160 40% 70%;
+    --islamic-gold: 43 61% 72%;
+    --islamic-green: 155 35% 36%;
     --prayer-time-bg: 175 30% 96%;
     
     /* Shadows */
@@ -69,9 +69,9 @@ All colors MUST be HSL.
     --popover: 215 25% 12%;
     --popover-foreground: 200 10% 92%;
 
-    --primary: 175 40% 60%;
+    --primary: 155 35% 60%;
     --primary-foreground: 0 0% 100%;
-    --primary-light: 175 35% 70%;
+    --primary-light: 148 30% 70%;
 
     --secondary: 215 20% 20%;
     --secondary-foreground: 200 10% 92%;
@@ -79,7 +79,7 @@ All colors MUST be HSL.
     --muted: 215 18% 22%;
     --muted-foreground: 200 10% 65%;
 
-    --accent: 40 60% 65%;
+    --accent: 43 61% 65%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 60% 65%;
@@ -87,10 +87,10 @@ All colors MUST be HSL.
 
     --border: 215 20% 22%;
     --input: 215 20% 22%;
-    --ring: 175 40% 60%;
+    --ring: 155 35% 60%;
 
-    --islamic-gold: 40 60% 65%;
-    --islamic-green: 160 35% 65%;
+    --islamic-gold: 43 61% 65%;
+    --islamic-green: 155 35% 60%;
     --prayer-time-bg: 215 20% 18%;
     
     --shadow-soft: 0 2px 12px rgba(0, 0, 0, 0.3);
